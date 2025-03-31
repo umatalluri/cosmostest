@@ -10,31 +10,26 @@ public class CosmosDbService
     private readonly string _databaseName;
     private readonly string _accountUri;
 
-    // Constructor to initialize CosmosDbService
     public CosmosDbService(IConfiguration configuration)
     {
-        // Get Cosmos DB URI and Database Name from configuration
-        _accountUri = configuration["CosmosDb:AccountUri"];  // Cosmos DB account URI
-        _databaseName = configuration["CosmosDb:DatabaseName"]; // Cosmos DB Database Name
+        _accountUri = configuration["CosmosDb:AccountUri"];
+        _databaseName = configuration["CosmosDb:DatabaseName"];
 
-        // Use DefaultAzureCredential for Managed Identity Authentication
         var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
         {
-            ManagedIdentityClientId = "7318c4ba-8710-479b-a4da-9551373b71a1" // Managed Identity Client ID
+            ManagedIdentityClientId = "7318c4ba-8710-479b-a4da-9551373b71a1"
         });
 
-        // Initialize CosmosClient using the account URI and Managed Identity credential
         _cosmosClient = new CosmosClient(_accountUri, credential);
     }
 
-    // Method to test connection to Cosmos DB
     public async Task<string> TestConnectionAsync()
     {
         try
         {
-            // Attempt to get the Cosmos DB database
-            var database = await _cosmosClient.GetDatabaseAsync(_databaseName);
-            return "Connection to Cosmos DB successful!";
+            // Use CreateDatabaseIfNotExistsAsync to test the connection (no GetDatabaseAsync exists)
+            DatabaseResponse response = await _cosmosClient.CreateDatabaseIfNotExistsAsync(_databaseName);
+            return $"Connection to Cosmos DB successful! Database ID: {response.Database.Id}";
         }
         catch (Exception ex)
         {
