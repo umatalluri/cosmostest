@@ -1,15 +1,14 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add CosmosDbService to DI container
-builder.Services.AddSingleton<CosmosDbService>();
+// Optional: Register services here
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Endpoint to test Cosmos DB connectivity
-app.MapGet("/", async (CosmosDbService cosmosDbService) =>
-{
-    var result = await cosmosDbService.TestConnectionAsync();
-    return Results.Ok(result);  // Return success or error message based on Cosmos DB connection status
-});
+app.MapGet("/", () => "Hello from Azure App Service + CosmosDB");
 
 app.Run();
