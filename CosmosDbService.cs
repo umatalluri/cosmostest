@@ -27,9 +27,13 @@ public class CosmosDbService
     {
         try
         {
-            // Use CreateDatabaseIfNotExistsAsync to test the connection (no GetDatabaseAsync exists)
-            DatabaseResponse response = await _cosmosClient.CreateDatabaseIfNotExistsAsync(_databaseName);
+            var database = _cosmosClient.GetDatabase(_databaseName);
+            DatabaseResponse response = await database.ReadAsync(); // Only reads, does not create
             return $"Connection to Cosmos DB successful! Database ID: {response.Database.Id}";
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return $"Database '{_databaseName}' not found.";
         }
         catch (Exception ex)
         {
